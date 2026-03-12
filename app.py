@@ -1,82 +1,89 @@
 import streamlit as st
 from gtts import gTTS
 
-st.set_page_config(page_title="Digit Eyes Catalog", page_icon="👓", layout="wide")
+# 1. அடிப்படை அமைப்புகள்
+st.set_page_config(page_title="Digit Eyes Real App", page_icon="👁️", layout="wide")
 
-# CSS - ஸ்டைலிங்
-st.markdown("""
-    <style>
-    .main { background-color: #f8f9fa; }
-    .lens-card { padding: 20px; border-radius: 15px; background-color: white; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    .price-tag { color: #28a745; font-weight: bold; font-size: 20px; }
-    </style>
-    """, unsafe_allow_html=True)
-
-st.title("👓 டிஜிட்டல் ஆப்டிகல்ஸ் - லென்ஸ் விபரங்கள்")
-
-# 1. வாய்ஸ் அசிஸ்டண்ட்
+# 2. வாய்ஸ் அசிஸ்டண்ட் பங்க்ஷன்
 def speak(text):
     try:
         tts = gTTS(text=text, lang='ta')
         tts.save("response.mp3")
         st.audio("response.mp3", format="audio/mp3", autoplay=True)
     except:
-        pass
+        st.warning("ஆடியோ பிளே செய்ய முடியவில்லை.")
 
-# 2. லென்ஸ் கேட்டலாக் (Data)
-lens_data = {
-    "Zeiss Lenses": [
-        {"name": "Zeiss BlueGuard", "features": "நீல நிறக் கதிர்களைத் தடுக்கும், மிகத் தெளிவான பார்வை.", "price": "₹3,500 - ₹5,000"},
-        {"name": "Zeiss PhotoFusion", "features": "வெயிலில் மிக வேகமாக கருப்பாக மாறும் தொழில்நுட்பம்.", "price": "₹6,000 - ₹8,500"},
-        {"name": "Zeiss DriveSafe", "features": "இரவு நேர வாகன ஓட்டிகளுக்குச் சிறந்தது.", "price": "₹7,500+"}
-    ],
-    "SLR / Essilor Lenses": [
-        {"name": "Crizal Prevencia", "features": "கண்களுக்குப் பாதுகாப்பு மற்றும் கீறல்கள் விழாத தன்மை.", "price": "₹2,800 - ₹4,500"},
-        {"name": "Transitions Gen 8", "features": "அதிவேகமாக நிறம் மாறும் லென்ஸ்.", "price": "₹5,500 - ₹9,000"},
-        {"name": "Eyezen", "features": "மொபைல் அதிகம் பயன்படுத்துபவர்களுக்கான சிறப்பு லென்ஸ்.", "price": "₹3,200+"}
-    ],
-    "Local / Economy Lenses": [
-        {"name": "Basic Blue Cut", "features": "சாதாரண கணினி பாதுகாப்பு லென்ஸ்.", "price": "₹800 - ₹1,500"},
-        {"name": "ARC Coating Lens", "features": "பிரதிபலிப்பு இல்லாத லென்ஸ்.", "price": "₹600 - ₹1,200"}
-    ]
-}
+# 3. சைடு மெனு (Sidebar)
+st.sidebar.title("டிஜிட்டல் ஆப்டிகல்ஸ்")
+menu = ["முகப்பு", "லென்ஸ் வகைகள் & விலைகள்", "பிராண்டுகள்", "கண் பாதுகாப்பு", "தொடர்புக்கு"]
+choice = st.sidebar.selectbox("பகுதியைத் தேர்ந்தெடுக்கவும்", menu)
 
-# 3. டிஸ்ப்ளே பகுதி
-tab1, tab2, tab3 = st.tabs(["💎 Zeiss", "🔬 SLR/Essilor", "💰 Economy"])
+# --- முகப்பு பக்கம் ---
+if choice == "முகப்பு":
+    st.title("👁️ டிஜிட்டல் ஆப்டிகல்ஸ் - AI ஆப்")
+    try:
+        st.image("shop.jpg", use_container_width=True)
+    except:
+        st.info("shop.jpg அப்லோட் செய்யவும்.")
+    st.header("வரவேற்பு!")
+    st.write("உங்கள் கண்களுக்கான சிறந்த தீர்வுகளை இங்கே பெறலாம். வாய்ஸ் அசிஸ்டண்ட் வசதியுடன் எங்களை அணுகுங்கள்.")
+    if st.button("வரவேற்பு செய்தியை கேட்க"):
+        speak("டிஜிட்டல் ஆப்டிகல்ஸ் உங்களை அன்புடன் வரவேற்கிறது. சிறந்த லென்ஸ் வகைகளைத் தேர்ந்தெடுக்க மெனுவைப் பார்க்கவும்.")
 
-with tab1:
-    st.header("Zeiss Premium Lenses")
-    for lens in lens_data["Zeiss Lenses"]:
-        with st.container():
-            st.markdown(f"""<div class='lens-card'>
-                <h3>{lens['name']}</h3>
-                <p>{lens['features']}</p>
-                <p class='price-tag'>தோராய விலை: {lens['price']}</p>
-                </div>""", unsafe_allow_html=True)
-            if st.button(f"பற்றி கேட்க: {lens['name']}", key=lens['name']):
-                speak(f"{lens['name']} பற்றி. {lens['features']}. இதன் விலை {lens['price']} முதல் தொடங்குகிறது.")
+# --- லென்ஸ் வகைகள் & விலைகள் ---
+elif choice == "லென்ஸ் வகைகள் & விலைகள்":
+    st.title("🔍 லென்ஸ் கேட்டலாக்")
+    
+    lenses = {
+        "Single Vision (சாதாரண)": "₹600 முதல்",
+        "Blue Cut (கம்ப்யூட்டர்)": "₹1,200 முதல்",
+        "Photochromic (நிறம் மாறும்)": "₹1,800 முதல்",
+        "Progressive (தூரம் & கிட்டம்)": "₹2,500 முதல்",
+        "Contact Lenses (காண்டாக்ட்)": "₹500 முதல்"
+    }
+    
+    for l_name, l_price in lenses.items():
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.subheader(l_name)
+        with col2:
+            st.write(f"**{l_price}**")
+        if st.button(f"{l_name} பற்றி கேட்க", key=l_name):
+            speak(f"{l_name} லென்ஸ் விலை {l_price} முதல் தொடங்குகிறது.")
+        st.divider()
 
-with tab2:
-    st.header("SLR / Essilor Lenses")
-    for lens in lens_data["SLR / Essilor Lenses"]:
-        with st.container():
-            st.markdown(f"""<div class='lens-card'>
-                <h3>{lens['name']}</h3>
-                <p>{lens['features']}</p>
-                <p class='price-tag'>தோராய விலை: {lens['price']}</p>
-                </div>""", unsafe_allow_html=True)
-            if st.button(f"பற்றி கேட்க: {lens['name']}", key=lens['name']):
-                speak(f"{lens['name']} பற்றி. {lens['features']}. இதன் விலை {lens['price']} முதல் தொடங்குகிறது.")
+# --- பிராண்டுகள் ---
+elif choice == "பிராண்டுகள்":
+    st.title("💎 சர்வதேச பிராண்டுகள்")
+    st.write("எங்களிடம் உள்ள சிறந்த பிராண்டுகள்:")
+    
+    brands = {
+        "ZEISS": "ஜெர்மனியின் மிகச்சிறந்த லென்ஸ் தொழில்நுட்பம்.",
+        "ESSILOR (SLR)": "Crizal மற்றும் வரிலக்ஸ் லென்ஸ்கள்.",
+        "HOYA": "ஜப்பானிய தரம் மற்றும் தெளிவு.",
+        "NOVA": "நவீன காலத்திற்கான டிஜிட்டல் லென்ஸ்கள்."
+    }
+    
+    for b_name, b_info in brands.items():
+        st.subheader(b_name)
+        st.write(b_info)
+        if st.button(f"{b_name} பற்றி கேட்க", key=b_name):
+            speak(f"{b_name} என்பது {b_info}")
+        st.divider()
 
-with tab3:
-    st.header("Economy Options")
-    for lens in lens_data["Local / Economy Lenses"]:
-        with st.container():
-            st.markdown(f"""<div class='lens-card'>
-                <h3>{lens['name']}</h3>
-                <p>{lens['features']}</p>
-                <p class='price-tag'>தோராய விலை: {lens['price']}</p>
-                </div>""", unsafe_allow_html=True)
+# --- கண் பாதுகாப்பு ---
+elif choice == "கண் பாதுகாப்பு":
+    st.title("🏥 கண் பாதுகாப்பு குறிப்புகள்")
+    st.success("கண்களைப் பாதுகாக்க சில டிப்ஸ்:")
+    st.write("1. 20-20-20 விதியைப் பின்பற்றுங்கள்.")
+    st.write("2. வருடம் ஒருமுறை கண் பரிசோதனை செய்யுங்கள்.")
+    st.write("3. தரமான கூலிங் கிளாஸ் அணியுங்கள்.")
+    if st.button("குறிப்புகளை கேட்க"):
+        speak("கண்களைப் பாதுகாக்க இருபது இருபது இருபது விதியைப் பின்பற்றுங்கள். மொபைல் பார்க்கும்போது கம்ப்யூட்டர் லென்ஸ் அணியுங்கள்.")
 
-st.divider()
-st.info("குறிப்பு: விலைகள் பவர் (Power) மற்றும் பிரேம்களைப் பொறுத்து மாறுபடலாம்.")
+# --- தொடர்புக்கு ---
+elif choice == "தொடர்புக்கு":
+    st.title("📞 எங்களை அணுக")
+    st.write("எங்கள் கடை முகவரி: (உங்கள் முகவரியை இங்கே இடவும்)")
+    st.write("போன்: (உங்கள் நம்பர்)")
+    st.markdown("[💬 WhatsApp-ல் பேச](https://wa.me/911234567890)") # உங்கள் நம்பரை மாற்றவும் 
