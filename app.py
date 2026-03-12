@@ -9,20 +9,26 @@ st.markdown("""
     .main { background-color: #f0f2f6; }
     .stButton>button { width: 100%; border-radius: 20px; background-color: #007bff; color: white; }
     </style>
-    """, unsafe_allow_stdio=True)
+    """, unsafe_allow_html=True)
 
 st.title("👓 டிஜிட்டல் ஆப்டிகல்ஸ் - AI விற்பனை உதவியாளர்")
 
 # 2. வாய்ஸ் அசிஸ்டண்ட் செயல்பாடு
 def speak(text):
-    tts = gTTS(text=text, lang='ta')
-    tts.save("response.mp3")
-    st.audio("response.mp3", format="audio/mp3", autoplay=True)
+    try:
+        tts = gTTS(text=text, lang='ta')
+        tts.save("response.mp3")
+        st.audio("response.mp3", format="audio/mp3", autoplay=True)
+    except:
+        st.warning("ஆடியோ பிளே செய்வதில் சிறிய சிக்கல் உள்ளது.")
 
 # கடையின் படம் மற்றும் அறிமுகம்
 col_img, col_txt = st.columns([1, 1])
 with col_img:
-    st.image("shop.jpg", use_container_width=True)
+    try:
+        st.image("shop.jpg", use_container_width=True)
+    except:
+        st.info("shop.jpg படம் இல்லை.")
 with col_txt:
     st.subheader("சிறந்த முறையில் கண்களைப் பரிசோதிக்கவும், தரமான லென்ஸ்களைப் பெறவும் வாருங்கள்!")
     st.write("எங்கள் AI உதவியாளர் உங்களுக்கு சரியான கண்ணாடியைத் தேர்ந்தெடுக்க உதவுவார்.")
@@ -36,7 +42,7 @@ with st.form("customer_form"):
     phone = st.text_input("மொபைல் எண்:")
     if st.form_submit_button("தள்ளுபடி கூப்பன் பெறுக"):
         if name and phone:
-            st.success(f"வாழ்த்துகள் {name}! உங்கள் தள்ளுபடி கூப்பன் உங்கள் வாட்ஸ்அப்பிற்கு வரும்.")
+            st.success(f"வாழ்த்துகள் {name}! உங்கள் தள்ளுபடி கூப்பன் தயார்.")
         else:
             st.warning("தயவுசெய்து விபரங்களை நிரப்பவும்.")
 
@@ -70,7 +76,8 @@ with col3:
 st.divider()
 
 # 5. வாட்ஸ்அப் இணைப்பு பட்டன்
-whatsapp_num = "911234567890" # உங்கள் போன் நம்பரை இங்கே மாற்றவும்
+# உங்கள் கடை போன் நம்பரை 911234567890 என்பதற்கு பதில் இங்கே மாற்றவும்
+whatsapp_num = "911234567890" 
 st.markdown(f"""
     <a href="https://wa.me/{whatsapp_num}?text=வணக்கம், எனக்கு ஒரு கண்ணாடி தேவைப்படுகிறது" target="_blank">
     <button style="width:100%; height:50px; background-color:#25D366; color:white; border:none; border-radius:10px; font-size:18px; cursor:pointer;">
