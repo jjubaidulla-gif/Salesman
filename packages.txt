@@ -1,2 +1,4 @@
-libgl1-mesa-glx
-
+libgl1
+libgles2-mesa
+libegl1-mesa
+libdbus-1-3
