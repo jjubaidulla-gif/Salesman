@@ -1,14 +1,13 @@
 import streamlit as st
 import cv2
 import mediapipe as mp
-import numpy as np
 
-st.set_page_config(page_title="Virtual Try-On Zone", layout="wide")
+st.set_page_config(page_title="Virtual Try-On", layout="wide")
 
-st.title("🕶️ விர்ச்சுவல் கண்ணாடி உலகம்")
-st.info("உங்கள் முகத்தைக் காட்டவும், கண்ணாடிகள் தானாகப் பொருந்தும்.")
+st.title("🕶️ விர்ச்சுவல் கண்ணாடி ட்ரை-ஆன்")
+st.write("கேமராவை ஆன் செய்து கண்ணாடியைப் பொருத்திப் பாருங்கள்.")
 
-# 1. முகத்தைக் கண்டறியும் செட்டப் (Face Mesh)
+# முகத்தைக் கண்டறியும் செட்டப்
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
@@ -27,15 +26,15 @@ if run:
 
         if results.multi_face_landmarks:
             for face_landmarks in results.multi_face_landmarks:
-                # கண்களின் புள்ளிகளைக் கண்டறிதல் (Landmarks)
-                # இந்த புள்ளிகள் கண்ணாடி எங்கு இருக்க வேண்டும் என்பதைத் தீர்மானிக்கும்
-                h, w, c = frame.shape
-                # வலது கண் மற்றும் இடது கண் புள்ளிகள்
-                p1 = face_landmarks.landmark[33]
-                p2 = face_landmarks.landmark[263]
+                # கண்ணின் புள்ளிகளில் ஒரு அடையாளம் காட்ட
+                h, w, _ = frame.shape
+                lx = int(face_landmarks.landmark[33].x * w)
+                ly = int(face_landmarks.landmark[33].y * h)
+                rx = int(face_landmarks.landmark[263].x * w)
+                ry = int(face_landmarks.landmark[263].y * h)
                 
-                cx, cy = int(p1.x * w), int(p1.y * h)
-                cv2.circle(frame, (cx, cy), 5, (0, 255, 0), -1) # ஒரு அடையாளத்திற்காக பச்சை வட்டம்
+                # ஒரு பச்சை நிறக் கோடு கண்களுக்கு இடையில் (கண்ணாடி வைக்க வேண்டிய இடம்)
+                cv2.line(frame, (lx, ly), (rx, ry), (0, 255, 0), 2)
         
         FRAME_WINDOW.image(frame, channels="BGR")
     cap.release()
