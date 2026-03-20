@@ -1,54 +1,55 @@
 import streamlit as st
-from gtts import gTTS
-import os
+import cv2
+import numpy as np
+import mediapipe as mp
+from PIL import Image
 
-# 1. அடிப்படை அமைப்புகள் (முக்கியம்: இதுதான் முதல் வரியாக இருக்க வேண்டும்)
-st.set_page_config(page_title="Digit Eyes Real App", page_icon="👁️", layout="wide")
+st.set_page_config(page_title="Optical Shop VTO", layout="centered")
+st.title("👓 உங்கள் முகத்திற்கு ஏற்ற கண்ணாடியைத் தேர்வு செய்யுங்கள்")
 
-# 2. வாய்ஸ் அசிஸ்டண்ட் பங்க்ஷன்
-def speak(text):
-    try:
-        tts = gTTS(text=text, lang='ta')
-        tts.save("response.mp3")
-        st.audio("response.mp3", format="audio/mp3", autoplay=True)
-    except:
-        st.warning("ஆடியோ பிளே செய்ய முடியவில்லை.")
+# முகத்தைக் கண்டறியும் டூல் (Mediapipe)
+mp_face_mesh = mp.solutions.face_mesh
+face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True)
 
-# 3. சைடு மெனு (Sidebar)
-st.sidebar.title("டிஜிட்டல் ஆப்டிகல்ஸ்")
-st.sidebar.info("விர்ச்சுவல் ட்ரை-ஆன் செய்ய இடதுபக்க மெனுவில் 'Virtual Try On' என்பதைத் தேர்ந்தெடுக்கவும்.")
+# 1. கண்ணாடிப் படத்தை அப்லோட் செய்தல் (உங்கள் கடையின் கண்ணாடி)
+# ஒருமுறை அப்லோட் செய்தால் போதும்
+glass_file = st.sidebar.file_uploader("கண்ணாடி PNG படத்தை பதிவேற்றவும்", type=['png'])
 
-menu = ["முகப்பு", "லென்ஸ் வகைகள் & விலைகள்", "பிராண்டுகள்", "கண் பாதுகாப்பு", "தொடர்புக்கு"]
-choice = st.sidebar.selectbox("பகுதியைத் தேர்ந்தெடுக்கவும்", menu)
+# 2. வாடிக்கையாளர் புகைப்படம்
+user_file = st.camera_input("உங்கள் முகத்தை புகைப்படம் எடுங்கள்")
 
-# --- முகப்பு பக்கம் ---
-if choice == "முகப்பு":
-    st.title("👁️ டிஜிட்டல் ஆப்டிகல்ஸ் - AI ஆப்")
-    st.header("வரவேற்பு!")
-    st.write("உங்கள் கண்களுக்கான சிறந்த தீர்வுகளை இங்கே பெறலாம். வாய்ஸ் அசிஸ்டண்ட் வசதியுடன் எங்களை அணுகுங்கள்.")
-    if st.button("வரவேற்பு செய்தியை கேட்க"):
-        speak("டிஜிட்டல் ஆப்டிகல்ஸ் உங்களை அன்புடன் வரவேற்கிறது. சிறந்த லென்ஸ் வகைகளைத் தேர்ந்தெடுக்க மெனுவைப் பார்க்கவும்.")
-
-# --- லென்ஸ் வகைகள் & விலைகள் ---
-elif choice == "லென்ஸ் வகைகள் & விலைகள்":
-    st.title("🔍 லென்ஸ் கேட்டலாக்")
-    lenses = {
-        "Single Vision (சாதாரண)": "₹600 முதல்",
-        "Blue Cut (கம்ப்யூட்டர்)": "₹1,200 முதல்",
-        "Photochromic (நிறம் மாறும்)": "₹1,800 முதல்",
-        "Progressive (தூரம் & கிட்டம்)": "₹2,500 முதல்"
-    }
-    for l_name, l_price in lenses.items():
-        col1, col2 = st.columns([3, 1])
-        with col1: st.subheader(l_name)
-        with col2: st.write(f"**{l_price}**")
-        if st.button(f"{l_name} பற்றி கேட்க", key=l_name):
-            speak(f"{l_name} லென்ஸ் விலை {l_price} முதல் தொடங்குகிறது.")
-        st.divider()
-
-# --- மற்ற பகுதிகள் (சுருக்கமாக) ---
-elif choice == "கண் பாதுகாப்பு":
-    st.title("🏥 கண் பாதுகாப்பு குறிப்புகள்")
-    st.write("1. 20-20-20 விதியைப் பின்பற்றுங்கள். 2. வருடம் ஒருமுறை கண் பரிசோதனை செய்யுங்கள்.")
-    if st.button("குறிப்புகளை கேட்க"):
-        speak("கண்களைப் பாதுகாக்க இருபது இருபது இருபது விதியைப் பின்பற்றுங்கள்.")
+if glass_file and user_file:
+    # படங்களை கம்ப்யூட்டர் புரியும் படி மாற்றுதல்
+    user_img = Image.open(user_file)
+    user_img = np.array(user_img)
+    
+    glass_img = Image.open(glass_file).convert("RGBA")
+    
+    # முகத்தில் புள்ளிகளைக் கண்டறிதல்
+    results = face_mesh.process(cv2.cvtColor(user_img, cv2.COLOR_RGB2BGR))
+    
+    if results.multi_face_landmarks:
+        for face_landmarks in results.multi_face_landmarks:
+            # இடது மற்றும் வலது கண் புள்ளிகள் (Points 33 & 263)
+            left_eye = face_landmarks.landmark[33]
+            right_eye = face_landmarks.landmark[263]
+            
+            # கண்களுக்கு இடைப்பட்ட தூரம் (Width calculation)
+            h, w, _ = user_img.shape
+            lx, ly = int(left_eye.x * w), int(left_eye.y * h)
+            rx, ry = int(right_eye.x * w), int(right_eye.y * h)
+            
+            glass_width = int(abs(rx - lx) * 2.5) # கண்ணாடியின் அளவு
+            glass_height = int(glass_width * (glass_img.height / glass_img.width))
+            
+            # கண்ணாடியை Resize செய்தல்
+            resized_glass = glass_img.resize((glass_width, glass_height))
+            
+            # முகத்தில் சரியான இடத்தில் பொருத்துதல் (Overlay)
+            user_pil = Image.fromarray(user_img)
+            offset = (lx - int(glass_width/4), ly - int(glass_height/2))
+            user_pil.paste(resized_glass, offset, resized_glass)
+            
+            st.image(user_pil, caption="உங்கள் புதிய லுக்!", use_container_width=True)
+    else:
+        st.error("முகம் சரியாகத் தெரியவில்லை. வெளிச்சத்தில் மீண்டும் முயலவும்.")
