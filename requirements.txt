@@ -2,3 +2,4 @@ streamlit
 gTTS
 opencv-python-headless
 mediapipe
+numpy
