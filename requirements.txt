@@ -2,3 +2,4 @@ streamlit
 mediapipe
 Pillow
 opencv-python
+numpy
