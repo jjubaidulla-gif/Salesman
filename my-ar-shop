@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-face-dots.prod.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-face-aframe.prod.js"></script>
+    
+    <style>
+      body { margin: 0; overflow: hidden; }
+      #header {
+        position: absolute; top: 10px; width: 100%; text-align: center;
+        color: white; font-family: sans-serif; z-index: 10;
+        background: rgba(0,0,0,0.5); padding: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <h2>உங்கள் கடை பெயர் - AR Try-On</h2>
+      <p>முகத்தை கேமராவிற்கு நேராக வைக்கவும்</p>
+    </div>
+
+    <a-scene mindar-face="uiScanning: #scanning-overlay" embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      <a-assets>
+        <a-asset-item id="glassesModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.2/examples/face-tracking/assets/glasses/scene.gltf"></a-asset-item>
+      </a-assets>
+
+      <a-camera active="false" position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <a-entity mindar-face-target="anchorIndex: 168">
+	<a-gltf-model rotation="0 0 0" position="0 0 0" scale="0.01 0.01 0.01" src="#glassesModel"></a-gltf-model>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
